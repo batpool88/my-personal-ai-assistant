@@ -5,7 +5,7 @@ import { Navigation } from "@/components/navigation"
 import { HeroSection } from "@/components/hero-section"
 import { ImageGenerator } from "@/components/image-generator"
 import { TextGenerator } from "@/components/text-generator"
-import { Footer } from "@/components/footer"
+import { UseCases } from "@/components/use-cases"
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState<"home" | "image" | "text">("home")
@@ -17,13 +17,12 @@ export default function Home() {
       {activeTab === "home" && (
         <>
           <HeroSection onGetStarted={() => setActiveTab("image")} />
+          <UseCases />
         </>
       )}
 
       {activeTab === "image" && <ImageGenerator />}
       {activeTab === "text" && <TextGenerator />}
-
-      <Footer />
     </div>
   )
 }
