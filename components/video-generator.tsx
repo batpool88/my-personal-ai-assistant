@@ -6,19 +6,19 @@ import { Card } from "@/components/ui/card"
 import { Textarea } from "@/components/ui/textarea"
 import { ParticleBackground } from "@/components/particle-background"
 
-export function ImageGenerator() {
+export function VideoGenerator() {
   const [prompt, setPrompt] = useState("")
   const [isLoading, setIsLoading] = useState(false)
-  const [imageUrl, setImageUrl] = useState<string | null>(null)
+  const [videoUrl, setVideoUrl] = useState<string | null>(null)
   const [error, setError] = useState("")
 
   useEffect(() => {
     return () => {
-      if (imageUrl) {
-        URL.revokeObjectURL(imageUrl)
+      if (videoUrl) {
+        URL.revokeObjectURL(videoUrl)
       }
     }
-  }, [imageUrl])
+  }, [videoUrl])
 
   const handleGenerate = async () => {
     if (!prompt.trim()) {
@@ -30,7 +30,7 @@ export function ImageGenerator() {
     setError("")
 
     try {
-      const response = await fetch("/api/generate-image", {
+      const response = await fetch("/api/generate-video", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -40,18 +40,18 @@ export function ImageGenerator() {
 
       if (!response.ok) {
         const data = await response.json().catch(() => null)
-        throw new Error(data?.error || "Failed to generate image")
+        throw new Error(data?.error || "Failed to generate video")
       }
 
-      const imageBlob = await response.blob()
-      const nextImageUrl = URL.createObjectURL(imageBlob)
+      const videoBlob = await response.blob()
+      const nextVideoUrl = URL.createObjectURL(videoBlob)
 
-      setImageUrl((currentImageUrl) => {
-        if (currentImageUrl) {
-          URL.revokeObjectURL(currentImageUrl)
+      setVideoUrl((currentVideoUrl) => {
+        if (currentVideoUrl) {
+          URL.revokeObjectURL(currentVideoUrl)
         }
 
-        return nextImageUrl
+        return nextVideoUrl
       })
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred")
@@ -64,14 +64,14 @@ export function ImageGenerator() {
     <section className="relative min-h-screen px-4 py-12 overflow-hidden">
       <ParticleBackground />
       <div className="max-w-4xl mx-auto relative z-10">
-        <h2 className="text-3xl font-bold mb-8">Image Generator</h2>
+        <h2 className="text-3xl font-bold mb-8">Video Generator</h2>
 
         <Card className="p-6 mb-8">
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium mb-2">Describe your image</label>
+              <label className="block text-sm font-medium mb-2">Describe your video</label>
               <Textarea
-                placeholder="e.g., A serene landscape with mountains and lake"
+                placeholder="e.g., A cinematic drone shot of a neon city at night in the rain"
                 value={prompt}
                 onChange={(e) => setPrompt(e.target.value)}
                 disabled={isLoading}
@@ -80,18 +80,22 @@ export function ImageGenerator() {
             </div>
 
             <Button onClick={handleGenerate} disabled={isLoading} className="w-full">
-              {isLoading ? "Generating..." : "Generate Image"}
+              {isLoading ? "Generating..." : "Generate Video"}
             </Button>
+
+            <p className="text-sm text-muted-foreground">
+              Video generation can take longer than text or image generation.
+            </p>
 
             {error && <p className="text-destructive text-sm">{error}</p>}
           </div>
         </Card>
 
-        {imageUrl && (
+        {videoUrl && (
           <Card className="p-6">
             <div className="space-y-4">
-              <h3 className="font-semibold">Generated Image</h3>
-              <img src={imageUrl} alt="Generated" className="w-full rounded-lg" />
+              <h3 className="font-semibold">Generated Video</h3>
+              <video src={videoUrl} controls className="w-full rounded-lg" />
             </div>
           </Card>
         )}

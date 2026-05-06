@@ -1,8 +1,8 @@
 "use client"
 
 interface NavigationProps {
-  activeTab: "home" | "image" | "text"
-  setActiveTab: (tab: "home" | "image" | "text") => void
+  activeTab: "home" | "image" | "text" | "video"
+  setActiveTab: (tab: "home" | "image" | "text" | "video") => void
 }
 
 export function Navigation({ activeTab, setActiveTab }: NavigationProps) {
@@ -46,6 +46,16 @@ export function Navigation({ activeTab, setActiveTab }: NavigationProps) {
             }`}
           >
             Text Generator
+          </button>
+          <button
+            onClick={() => setActiveTab("video")}
+            className={`text-sm font-medium transition ${
+              activeTab === "video"
+                ? "text-primary border-b-2 border-primary"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            Video Generator
           </button>
         </div>
       </div>

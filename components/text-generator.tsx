@@ -6,16 +6,6 @@ import { Card } from "@/components/ui/card"
 import { Textarea } from "@/components/ui/textarea"
 import { ParticleBackground } from "@/components/particle-background"
 
-declare global {
-  interface Window {
-    puter?: {
-      ai: {
-        chat: (prompt: string) => Promise<string>
-      }
-    }
-  }
-}
-
 export function TextGenerator() {
   const [prompt, setPrompt] = useState("")
   const [isLoading, setIsLoading] = useState(false)
@@ -32,14 +22,21 @@ export function TextGenerator() {
     setError("")
 
     try {
-      // Check if Puter.js is loaded
-      if (!window.puter || !window.puter.ai) {
-        throw new Error("Puter.js is not loaded. Please refresh the page.")
+      const response = await fetch("/api/generate-text", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ prompt }),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to generate text")
       }
 
-      // Use Puter.js AI chat API
-      const response = await window.puter.ai.chat(prompt)
-      setGeneratedText(response)
+      setGeneratedText(data.text)
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred")
     } finally {

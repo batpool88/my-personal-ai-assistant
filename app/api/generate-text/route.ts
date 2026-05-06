@@ -1,5 +1,8 @@
-import { generateText } from "ai"
-import { openai } from "@ai-sdk/openai"
+import {
+  getErrorMessage,
+  HF_TEXT_MODEL,
+  requireHuggingFaceClient,
+} from '@/lib/huggingface'
 
 export async function POST(request: Request) {
   try {
@@ -9,14 +12,31 @@ export async function POST(request: Request) {
       return Response.json({ error: "Prompt is required" }, { status: 400 })
     }
 
-    const { text } = await generateText({
-      model: openai("gpt-4-turbo"),
-      prompt,
+    const client = requireHuggingFaceClient()
+    const response = await client.chatCompletion({
+      model: HF_TEXT_MODEL,
+      messages: [
+        {
+          role: 'user',
+          content: prompt,
+        },
+      ],
+      max_tokens: 400,
+      temperature: 0.7,
     })
 
-    return Response.json({ text })
+    const text = response.choices[0]?.message?.content
+
+    if (!text || typeof text !== 'string') {
+      throw new Error('No text was returned by the model.')
+    }
+
+    return Response.json({ text: text.trim() })
   } catch (error) {
     console.error("Text generation error:", error)
-    return Response.json({ error: "Failed to generate text" }, { status: 500 })
+    return Response.json(
+      { error: `Failed to generate text: ${getErrorMessage(error)}` },
+      { status: 500 },
+    )
   }
 }
